@@ -25,7 +25,7 @@ df_reddit = pd.read_csv("./test/reddit/reddit_sentiment.csv")
 df_news = pd.read_csv("./test/news_articles/news_sentiment.csv")
 
 
-### Data cleaning for bitcoin prices
+# Data cleaning for bitcoin prices
 df.rename(columns={"Open time": "date"}, inplace=True)
 df["date"] = df["date"].apply(
     lambda x: datetime.fromtimestamp(x / 1000).strftime("%Y-%m-%d %H:%M:%S")
@@ -35,19 +35,20 @@ df["date"] = df["date"].astype("datetime64[ns]")
 df.drop(columns=["Ignore"], inplace=True)
 
 
-### Data cleaning for fear greed index
-df_fear_greed.rename(columns={"timestamp": "date", "value": "fear_greed"}, inplace=True)
+# Data cleaning for fear greed index
+df_fear_greed.rename(
+    columns={"timestamp": "date", "value": "fear_greed"}, inplace=True)
 df_fear_greed["date"] = df_fear_greed["date"].astype("datetime64[ns]")
 
 
-### Data cleaning for reddit data
+# Data cleaning for reddit data
 df_reddit["date"] = df_reddit["date"].astype("datetime64[ns]")
 
 
-### Data cleaning for news data
+# Data cleaning for news data
 df_news["date"] = df_news["date"].astype("datetime64[ns]")
 
-### Merging datasets
+# Merging datasets
 df = pd.merge(df, df_reddit, how="left", on="date")
 df = pd.merge(df, df_fear_greed, how="left", on="date")
 df = pd.merge(df, df_news, how="left", on="date")
@@ -71,7 +72,7 @@ test_set = scaler.transform(test)
 def create_dataset(dataset, look_back, column_index):
     dataX, dataY = [], []
     for i in range(len(dataset) - look_back - 1):
-        a = dataset[i : (i + look_back)]
+        a = dataset[i: (i + look_back)]
         dataX.append(a)
         dataY.append(dataset[i + look_back, column_index])
 
@@ -84,7 +85,8 @@ def train_model_lookback(look_back: int):
     X_train, y_train = create_dataset(training_set, look_back, column_index)
     X_test, y_test = create_dataset(test_set, look_back, column_index)
 
-    X_train = np.reshape(X_train, (X_train.shape[0], look_back, X_train.shape[2]))
+    X_train = np.reshape(
+        X_train, (X_train.shape[0], look_back, X_train.shape[2]))
     X_test = np.reshape(X_test, (X_test.shape[0], look_back, X_test.shape[2]))
 
     #### Model Creation ####
@@ -106,14 +108,16 @@ def train_model_lookback(look_back: int):
     # add the other layers
     for i in range(1, 3):
         size = 128 / (2 * i)
-        model.add(Conv1D(size, kernel_size=2, padding="same", activation="linear"))
+        model.add(Conv1D(size, kernel_size=2,
+                  padding="same", activation="linear"))
         model.add(MaxPooling1D(pool_size=2, padding="same"))
         model.add(Dropout(0.2))
 
     # flatten and add a dense layer and to output the prediction
     model.add(Flatten())
     model.add(Dense(1, activation="sigmoid"))
-    model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
+    model.compile(loss="binary_crossentropy",
+                  optimizer="adam", metrics=["accuracy"])
 
     #### Model Training and Model Evaluation ####
     history = model.fit(
@@ -126,21 +130,18 @@ def train_model_lookback(look_back: int):
         validation_split=0.1,
     )
 
-
     day = []
     for data in X_train:
         temp = datetime.fromtimestamp(
             scaler.inverse_transform(data)[1][5] / 1000
         ).strftime("%Y-%m-%d")
         day.append(temp)
-    
+
     for data in X_test:
         temp = datetime.fromtimestamp(
             scaler.inverse_transform(data)[1][5] / 1000
         ).strftime("%Y-%m-%d")
         day.append(temp)
-    
-    
 
     # Make predictions on the test data
     trainPredict_proba = model.predict(X_train)
@@ -154,7 +155,8 @@ def train_model_lookback(look_back: int):
     trainAccuracy = accuracy_score(y_train, trainPredict.flatten())
     testAccuracy = accuracy_score(y_test, testPredict.flatten())
 
-    probabilities = np.concatenate((trainPredict_proba.flatten(), testPredict_proba.flatten()))
+    probabilities = np.concatenate(
+        (trainPredict_proba.flatten(), testPredict_proba.flatten()))
     output_dict = {
         "date": day,
         "probability": probabilities,
@@ -169,6 +171,6 @@ def train_model_lookback(look_back: int):
     model.save(f"./test/save_files/{look_back}_cnn_model")
 
 
-# train_model_lookback(1)
+train_model_lookback(1)
 train_model_lookback(3)
-# train_model_lookback(5)
+train_model_lookback(5)
