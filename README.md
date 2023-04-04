@@ -131,7 +131,9 @@ Set up a virtual environment using the requirement.txt file or run pip install -
 
 Edit the reddit.json file to contain the necessary credentials from setting up a reddit developer account. More information can be found here https://www.reddit.com/wiki/api/
 
-Schedule a CRON job for the main.py file to occur on a daily basis at 07:59:00 UTC 
+Schedule a CRON job for the main.py file to occur on a daily basis at 07:59:00 UTC. 
+
+More information on how to set up a CRON job can be found at https://www.hostinger.com/tutorials/cron-job
 
 
 
