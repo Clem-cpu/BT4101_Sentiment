@@ -83,6 +83,10 @@ Folder contains modules responsible for scraping market data
 2. fear_greed_index.py
 * Fear and greed index scraping from https://alternative.me/crypto/fear-and-greed-index/ 
 
+### src/main.py
+
+Folder which contains the module to be run for the CRON job to scrape data on a daily basis
+
 ### test/application_files
 
 Folder contains files necessary for creating the dashboard application
@@ -127,6 +131,7 @@ Set up a virtual environment using the requirement.txt file or run pip install -
 
 Edit the reddit.json file to contain the necessary credentials from setting up a reddit developer account. More information can be found here https://www.reddit.com/wiki/api/
 
+Schedule a CRON job for the main.py file to occur on a daily basis at 07:59:00 UTC 
 
 
 
